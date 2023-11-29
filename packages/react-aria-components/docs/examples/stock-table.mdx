@@ -89,6 +89,8 @@ import {Table, TableHeader, TableBody, Column, Row, Cell, ResizableTableContaine
 import type {ColumnProps, RowProps, CellProps, SortDescriptor} from 'react-aria-components';
 import ArrowUpIcon from '@spectrum-icons/ui/ArrowUpSmall';
 import {useState, useMemo} from 'react';
+import {RadioGroup, Radio, Label} from 'react-aria-components';
+import CheckCircleIcon from '@spectrum-icons/workflow/CheckmarkCircle';
 
 function StockTableExample() {
   let [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({column: 'symbol', direction: 'ascending'});
@@ -101,7 +103,7 @@ function StockTableExample() {
         cmp *= -1;
       }
       return cmp;
-    })
+    }).slice(0, 1);
   }, [sortDescriptor]);
 
   return (
@@ -122,7 +124,15 @@ function StockTableExample() {
                 <StockCell className="font-semibold">{item.name}</StockCell>
                 <StockCell>{item.marketCap}</StockCell>
                 <StockCell>{item.sector}</StockCell>
-                <StockCell>{item.industry}</StockCell>
+                <StockCell>
+                  <div className="bg-gradient-to-r from-blue-300 to-indigo-300 p-2 sm:p-8 rounded-lg flex justify-center">
+                    <RadioGroup className="flex flex-col gap-2 w-full max-w-[300px]" defaultValue="Standard">
+                      <Label className="text-xl text-slate-900 font-semibold font-serif">Shipping</Label>
+                      <ShippingOption name="Standard" time="4-10 business days" price="$4.99" />
+                      <ShippingOption name="Express" time="2-5 business days" price="$15.99" />
+                    </RadioGroup>
+                  </div>
+                </StockCell>
               </StockRow>
             )}
           </TableBody>
@@ -158,6 +168,44 @@ function StockRow<T extends object>(props: RowProps<T>) {
 
 function StockCell(props: CellProps) {
   return <Cell {...props} className={`px-4 py-2 truncate ${props.className} focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-600 focus-visible:-outline-offset-4 group-selected:focus-visible:outline-white`} />;
+}
+
+function RadioGroupExample() {
+  return (
+    <div className="bg-gradient-to-r from-blue-300 to-indigo-300 p-2 sm:p-8 rounded-lg flex justify-center">
+      <RadioGroup className="flex flex-col gap-2 w-full max-w-[300px]" defaultValue="Standard">
+        <Label className="text-xl text-slate-900 font-semibold font-serif">Shipping</Label>
+        <ShippingOption name="Standard" time="4-10 business days" price="$4.99" />
+        <ShippingOption name="Express" time="2-5 business days" price="$15.99" />
+        <ShippingOption name="Lightning" time="1 business day" price="$24.99" />
+      </RadioGroup>
+    </div>
+  );
+}
+
+function ShippingOption({name, time, price}) {
+  return (
+    <Radio value={name} className={({isFocusVisible, isSelected, isPressed}) => `
+      group relative flex cursor-default rounded-lg px-4 py-3 shadow-lg outline-none bg-clip-padding border border-solid
+      ${isFocusVisible ? 'ring-2 ring-blue-600 ring-offset-1 ring-offset-white/80' : ''}
+      ${isSelected ? 'bg-blue-600 border-white/30 text-white' : 'border-transparent'}
+      ${isPressed && !isSelected ? 'bg-blue-50' : ''}
+      ${!isSelected && !isPressed ? 'bg-white' : ''}
+    `}>
+      <div className="flex w-full items-center justify-between gap-3">
+        <div className="flex items-center shrink-0 text-blue-100 group-selected:text-white">
+          <CheckCircleIcon size="M" />
+        </div>
+        <div className="flex flex-1 flex-col">
+          <div className="text-lg font-serif font-semibold text-gray-900 group-selected:text-white">{name}</div>
+          <div className="inline text-gray-500 group-selected:text-sky-100">
+            {time}
+          </div>
+        </div>
+        <div className="font-medium font-mono text-gray-900 group-selected:text-white">{price}</div>
+      </div>
+    </Radio>
+  );
 }
 ```
 
